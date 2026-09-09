@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="圓覺經舍">
+  <rect width="64" height="64" rx="13" ry="13" fill="rgb(247, 244, 238)"/>
+  <text x="32" y="32" fill="rgb(51, 48, 43)"
+        font-family="'Noto Serif TC', 'Songti TC', 'PMingLiU', 'Source Han Serif TC', serif"
+        font-weight="600" font-size="46"
+        text-anchor="middle" dominant-baseline="central">圓</text>
+</svg>
