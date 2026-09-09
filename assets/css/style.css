@@ -664,18 +664,28 @@ section[id] {
 /* ==========================================================================
    §5.8 聯絡師父
    ========================================================================== */
+/* §5.8 手機（< 768px）：卡片內容全部置中（E-24）。
+   採 mobile-first：置中寫在預設層，平板／桌機於下方 min-width 查詢改回靠左。 */
 .contact-panel {
   background-color: var(--c-surface);
   border: var(--bw-hair) solid var(--c-line);
   padding: var(--sp-4);
   display: grid;
   gap: var(--sp-8);
+  text-align: center;
 }
 
 .contact__icon {
   width: var(--sp-4);
   height: var(--sp-4);
   color: var(--c-brown);
+}
+
+/* 手機：圖示與 QR 圖受全域 reset 為 display: block，text-align 對其無效，
+   須以 margin-inline: auto 置中（平板以上於下方 min-width 查詢歸零）。 */
+.contact__icon:not(.contact__icon--inline),
+.contact__qr {
+  margin-inline: auto;
 }
 
 .contact__icon--inline {
@@ -697,6 +707,7 @@ section[id] {
   margin-block-start: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--sp-1);
 }
 
@@ -735,6 +746,13 @@ section[id] {
   margin-bottom: 0;
 }
 
+/* §5.8 手機：地址為「圖示在上、文字在下」，不並排、不留懸掛縮排 */
+.contact__address .contact__icon--inline {
+  display: block;
+  margin-inline: auto;
+  margin-block-end: var(--sp-1);
+}
+
 .contact__qr {
   width: min(var(--qr-size), 100%);
   height: auto;
@@ -751,10 +769,27 @@ section[id] {
 }
 
 @media (min-width: 768px) {
+  /* §5.8 平板／桌機：維持左右兩欄、內容靠左（置中規則只適用手機斷點） */
   .contact-panel {
     grid-template-columns: 7fr 5fr;
     gap: var(--sp-8);
     padding: var(--sp-8);
+    text-align: start;
+  }
+
+  .contact__lead--qr {
+    justify-content: flex-start;
+  }
+
+  .contact__address .contact__icon--inline {
+    display: inline-block;
+    margin-inline: 0 var(--sp-1);
+    margin-block-end: 0;
+  }
+
+  .contact__icon:not(.contact__icon--inline),
+  .contact__qr {
+    margin-inline: 0;
   }
 }
 
