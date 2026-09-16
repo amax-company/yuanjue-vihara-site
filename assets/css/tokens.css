@@ -1,6 +1,6 @@
 /* ==========================================================================
    圓覺經舍 — 設計 token
-   spec/current.md v1.1 §4 的鏡像。**本檔是全站唯一允許寫死數值的檔案**
+   spec/current.md v2.0 §4 的鏡像。**本檔是全站唯一允許寫死數值的檔案**
    （§4 前言：元件層禁止出現 font-size px 字面值、hex 色碼、間距 px 字面值）。
 
    改動任何一個值以前，先改 spec §4 並記 spec/changelog.md。
@@ -20,13 +20,14 @@
   --c-ink-soft: #5C564E;  /* 次要文字、標籤、圖說 */
   --c-green: #2F4438;     /* 深墨綠：頁尾底、強調 */
   --c-brown: #7A5C3C;     /* 赭褐：小標、圖示 */
-  --c-gold: #B08D57;      /* 金：僅限分隔線／邊框／圖示描邊。禁止用於任何文字 */
+  --c-gold: #B08D57;      /* 金：v2.0 收斂為兩處 —— 頁尾短分隔線、<h2> 下短細線。
+                             禁止用於文字、卡片裝飾線、邊框、圖示描邊、色塊、漸層（§4.1） */
   --c-on-dark: #EDE7DC;   /* 深底（--c-green）上的文字 */
 
-  /* --c-ink 的三通道值，供元件層做半透明疊色用（§5.2 首屏暗化漸層 0 -> 0.45、
+  /* --c-ink 的三通道值，供元件層做半透明疊色用（§5.2 首屏暗化漸層 0 -> --hero-veil-alpha、
      §4.7 --lightbox-veil 0.9）。與 --c-ink #33302B 同色，只是另一種表示法，
      故視為 §4.1 的一部分，不算「多餘的色彩 token」。
-     用法：rgb(var(--c-ink-rgb) / 0.45)  ← 元件層仍不得出現 hex（D6）
+     用法：rgb(var(--c-ink-rgb) / var(--hero-veil-alpha))  ← 元件層仍不得出現 hex（D6）
      依 Orchestrator 2026-09-08 13:40 裁決第 2 點。 */
   --c-ink-rgb: 51 48 43;
 
@@ -34,7 +35,8 @@
      §4.2 字級（此區為「手機」值；平板／桌機在下方 media query 覆寫）
      硬性下限：內文 >= 18px、圖說/標籤/小字/版權列 >= 16px、電話 >= 28px
      --------------------------------------------------------------------- */
-  --fs-hero: 40px;         /* 首屏主標 */
+  --fs-hero: 56px;         /* 首屏主標（毛筆字，字族 --ff-brush）。
+                              v2.0 放大，勿改回 40px（§4.2：修改單 02 的年長者下限） */
   --fs-hero-sub: 24px;     /* 首屏副標 */
   --fs-hero-lead: 18px;    /* 首屏引言 */
   --fs-h2: 30px;           /* 區塊標題 */
@@ -75,7 +77,9 @@
 
   /* §4.3 固定尺寸 token（本節為寬高數值的唯一事實來源） */
   --container-max: 1120px;  /* 內容容器最大寬 */
-  --qr-size: 200px;         /* §5.8 LINE QR 區塊邊長（正方形，寬＝高）。
+  --qr-size: 240px;         /* §5.8 LINE QR 區塊邊長（正方形，寬＝高）。
+                               v2.0 由 200px 放大，勿改回：修改單 08 要求 QR 視覺權重
+                               高於電話，且**只以放大 QR 達成**（--fs-phone 一字不動）。
                                手機斷點由元件層以 min(var(--qr-size), 100%) 收縮，
                                維持 1:1；實檔到位後同一 token 套用於 line-qr.png。 */
 
@@ -112,8 +116,14 @@
      --------------------------------------------------------------------- */
   --ff-title: "Noto Serif TC", "Songti TC", "PMingLiU", "Source Han Serif TC", serif;
   --ff-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Heiti TC", sans-serif;
+  /* §4.6 毛筆字族（v2.0）。字族串列＝Bakudai + 標題 fallback 串列，
+     刻意以 var(--ff-title) 引用而非複製一份（§4.6：不另立一份）。
+     **全站唯一使用處為 .hero__title**（§4.6 QA 判準：使用處數為 1）。 */
+  --ff-brush: "Bakudai", var(--ff-title);
   --fw-title: 600; /* §4.6：標題僅載入字重 600 */
   --fw-body: 400;  /* §4.6：內文僅載入字重 400 */
+  --fw-brush: 500; /* §4.6：自架毛筆子集只有 Medium 一個字重；
+                      不設這個值 h1 會繼承 --fw-title 600 而觸發合成粗體 */
 
   /* ---------------------------------------------------------------------
      衍生值（非 §4 表列新數值）
@@ -123,7 +133,8 @@
   --nav-h: var(--nav-h-mobile);                     /* 當前斷點的導覽列高（§4.5） */
   --scroll-mt: calc(var(--nav-h) + var(--sp-2));    /* §4.5：錨點落點 = 導覽列高 + --sp-2 */
   --bw-hair: 1px;        /* §5.1／§5.3／§5.6／§5.8 明文的 1px 分隔線與邊框 */
-  --bw-accent: 3px;      /* §5.3 簡歷小卡左側 3px --c-gold 直線 */
+  /* v2.0 移除 --bw-accent（原 §5.3 簡歷小卡左側 3px --c-gold 直線）：
+     §4.1 把 --c-gold 收斂為兩種用途，裝飾線不在其中（修改單 01）。勿加回。 */
   --focus-ring-w: 2px;   /* §5.14 focus 樣式：2px --c-brown outline */
   --focus-ring-offset: 2px; /* §5.14 focus 樣式：2px offset */
 }
@@ -134,7 +145,7 @@
 @media (min-width: 768px) {
   :root {
     /* §4.2 字級（平板） */
-    --fs-hero: 52px;
+    --fs-hero: 72px;
     --fs-hero-sub: 26px;
     --fs-hero-lead: 19px;
     --fs-h2: 36px;
@@ -162,7 +173,7 @@
 @media (min-width: 1024px) {
   :root {
     /* §4.2 字級（桌機） */
-    --fs-hero: 64px;
+    --fs-hero: 96px;
     --fs-hero-sub: 30px;
     --fs-hero-lead: 20px;
     --fs-h2: 40px;

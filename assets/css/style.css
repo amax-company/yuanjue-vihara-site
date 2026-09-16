@@ -7,6 +7,24 @@
    CSS 採 mobile-first（min-width query）。
    ========================================================================== */
 
+/* ==========================================================================
+   §4.6 自架毛筆字型（v2.0）—— 只含 §附錄 A.2 主標的四個字，由
+   tools/build-fonts.py 產生，授權檔隨檔散布於同一目錄（§3.5 OFL）。
+
+   ⚠️ 這裡的 font-display: swap 與 Noto 兩套的 display=optional **不互斥**：
+   §4.6 明文 display 是逐字型檔的設定。Noto 是整頁大量中文（換字會位移）故用
+   optional；毛筆子集只有四個字、且它就是首屏的視覺主體，用 optional 會變成
+   「第一次造訪的人根本看不到毛筆字」。§4.6 的「display=swap 命中數為 0」判準
+   只適用 Google Fonts <link> 的 URL 查詢參數，不適用本宣告。
+   ========================================================================== */
+@font-face {
+  font-family: 'Bakudai';
+  src: url('../fonts/bakudai-hero-subset.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ---------- reset ---------- */
 *,
 *::before,
@@ -339,6 +357,16 @@ section[id] {
   .js .site-nav__menu {
     display: block;
   }
+
+  /* v2.0：導覽項由六項增為七項（§附錄 A.1 新增「關於化緣」）。
+     平板 768 的可用內容寬只有 704px，七項各留 --sp-1 的左右內距會換行 ——
+     導覽列高度變成 97px，違反 §4.5 的 76px（實測：需要 768.8px，超出 64.8px）。
+     這裡把內距收掉、只留 --sp-1 的欄間距，實測需求降為 656.8px。
+     可點區域仍合格：每項文字寬 73.5px、高 --tap-min，皆 >= §4.7 的 44px。
+     ⚠️ 只在 768–1023 生效，>= 1024 於下方改回 --sp-1（那裡寬度足夠）。 */
+  .site-nav__link {
+    padding-inline: 0;
+  }
 }
 
 /* ==========================================================================
@@ -392,7 +420,14 @@ section[id] {
      對比改由 --hero-veil-alpha 承擔。 */
 }
 
+/* §5.2 主標：字族 --ff-brush、字級 --fs-hero。
+   **全站唯一使用 --ff-brush 的地方**（§4.6 QA 判準：使用處數為 1）——
+   副標／引言／捲動提示一律維持 §4.6 的標題／內文字族。
+   font-weight 另外指定 --fw-brush：h1 從 `h1,h2,h3` 那條規則繼承 --fw-title（600），
+   而自架子集只有 Medium（500）一個字重，不覆寫會觸發瀏覽器合成粗體（筆畫糊掉）。 */
 .hero__title {
+  font-family: var(--ff-brush);
+  font-weight: var(--fw-brush);
   font-size: var(--fs-hero);
   margin-bottom: var(--sp-3);
 }
@@ -476,10 +511,67 @@ section[id] {
   line-height: var(--lh-body);
 }
 
+/* §5.3 段距（v2.0）：一般段與段之間 --sp-3（由全域 p 的 margin-bottom 提供）；
+   **傳承段（§附錄 A.3 第二、三段，class .is-lineage）與其前後段之間為 --sp-5**，
+   而第二、三段彼此之間仍為 --sp-3。
+   相鄰兄弟的上下 margin 會摺疊取大值，所以只要在「傳承段的第一段」與
+   「傳承段之後那一段」加 margin-top --sp-5 即可得到 40／24／40／24 的節奏。 */
+.split__body > p.is-lineage {
+  margin-block-start: var(--sp-5);
+}
+
+.split__body > p.is-lineage + p.is-lineage {
+  margin-block-start: 0;
+}
+
+.split__body > p.is-lineage + p:not(.is-lineage) {
+  margin-block-start: var(--sp-5);
+}
+
+/* §5.3「關於法會」小標（v2.0）。⚠️ 其下不得出現按鈕／連結／表單（修改單 04） */
+.split__subtitle {
+  margin-block-start: var(--sp-6);
+  margin-bottom: var(--sp-3);
+  font-size: var(--fs-h3);
+  color: var(--c-brown);
+}
+
 /* §5.5：三段之間以 1px --c-line 分隔 */
 .split__body--ruled > p + p {
   border-block-start: var(--bw-hair) solid var(--c-line);
   padding-block-start: var(--sp-3);
+}
+
+/* ==========================================================================
+   §5.5b 關於化緣（v2.0 新增）— 純文字區塊，文字欄置中、左右留白充足
+   ========================================================================== */
+/* 文字欄寬度為 §5.5b 明文的 min(var(--container-max), 68ch)。
+   68ch 是 §5.5b 直接指定的字面值（可讀行長），不是本檔自訂的寬度 ——
+   §4.3 沒有對應 token，spec 是以運算式的形式給的，故逐字照抄。 */
+.prose {
+  max-width: min(var(--container-max), 68ch);
+  margin-inline: auto;
+}
+
+.prose > p {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+/* §5.5b：示意圖最大顯示寬 --container-max、水平置中、下方不加圖說 */
+.prose__img {
+  width: 100%;
+  max-width: var(--container-max);
+  height: auto;
+  margin-block: var(--sp-6);
+  margin-inline: auto;
+}
+
+/* §5.5b「關於閉關」小標：<h3>，不另開 <section>、不計入 <h2> 數、不新增導覽項 */
+.prose__subtitle {
+  margin-bottom: var(--sp-3);
+  font-size: var(--fs-h3);
+  color: var(--c-brown);
 }
 
 @media (min-width: 768px) {
@@ -517,13 +609,15 @@ section[id] {
 }
 
 /* ---- §5.3 法師簡歷小卡 ---- */
+/* ⚠️ v2.0：**四周只有 1px --c-line，不得有左側金色直線**（原 3px --c-gold 已移除）。
+   依修改單 01 與 §4.1 的收斂：--c-gold 只剩頁尾短分隔線與 <h2> 下短細線兩種用途，
+   卡片裝飾線不在其中。勿改回。 */
 .resume {
   margin-block-start: var(--sp-8);
   margin-inline: auto;
   max-width: calc(var(--container-max) * 0.62);
   background-color: var(--c-surface);
   border: var(--bw-hair) solid var(--c-line);
-  border-inline-start: var(--bw-accent) solid var(--c-gold);
   padding: var(--sp-6);
 }
 
@@ -571,7 +665,8 @@ section[id] {
 }
 
 /* §5.4／§5.6 手機：單欄直向堆疊，全部可見（不做輪播，§5.10） */
-.grid--three {
+.grid--three,
+.grid--cards {
   grid-template-columns: 1fr;
 }
 
@@ -584,6 +679,15 @@ section[id] {
 @media (min-width: 768px) {
   .grid--three {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* §5.6（v2.0）：兩張卡橫排等寬，**整組卡片在容器內水平置中**，
+     整組最大寬度為 §5.6 明文的 calc(var(--container-max) * 0.72)
+     —— 目的是不讓兩張卡被拉成過寬的長條。 */
+  .grid--cards {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: calc(var(--container-max) * 0.72);
+    margin-inline: auto;
   }
 
   .grid--gallery {
@@ -601,6 +705,11 @@ section[id] {
 @media (min-width: 1024px) {
   .site-nav__list {
     gap: var(--sp-1) var(--sp-3);
+  }
+
+  /* 桌機寬度夠（實測七項需 872.5px，可用 928px），內距改回 --sp-1 */
+  .site-nav__link {
+    padding-inline: var(--sp-1);
   }
 }
 
@@ -768,13 +877,42 @@ section[id] {
   color: var(--c-ink-soft);
 }
 
+/* ---- §5.8 聯絡須知框（v2.0，修改單 08）----
+   位置在聯絡資訊之下、同一面板內、橫跨整個面板寬度。
+   🚨 三段本文字級為 --fs-body（與 §5.5b 本文相同），**不得縮小**；
+   框內不得使用 --c-gold、不得加裝飾線（§4.1 v2.0 收斂）。 */
+.contact-notice {
+  background-color: var(--c-bg-alt);
+  border: var(--bw-hair) solid var(--c-line);
+  padding: var(--sp-4);
+}
+
+.contact-notice__title {
+  margin-bottom: var(--sp-3);
+  font-size: var(--fs-h3);
+  color: var(--c-brown);
+}
+
+.contact-notice__text {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
 @media (min-width: 768px) {
-  /* §5.8 平板／桌機：維持左右兩欄、內容靠左（置中規則只適用手機斷點） */
+  /* §5.8 平板／桌機：維持左右兩欄、內容靠左（置中規則只適用手機斷點）。
+     ⚠️ v2.0 左右對調：**左欄＝LINE（主要）**、右欄＝電話與地址（次要）。
+     左欄用 minmax(var(--qr-size), 5fr)：768 的可用寬下 5fr 只有約 213px，
+     純 fr 會把 QR 壓到小於 --qr-size（§4.3 的收縮條款只授權給手機斷點）。 */
   .contact-panel {
-    grid-template-columns: 7fr 5fr;
+    grid-template-columns: minmax(var(--qr-size), 5fr) 7fr;
     gap: var(--sp-8);
     padding: var(--sp-8);
     text-align: start;
+  }
+
+  /* 聯絡須知橫跨整個面板寬度（§5.8） */
+  .contact-notice {
+    grid-column: 1 / -1;
   }
 
   .contact__lead--qr {
