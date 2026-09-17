@@ -820,6 +820,15 @@ section[id] {
   gap: var(--sp-1);
 }
 
+/* §5.8（E-28，2026-09-17）：右欄電話小標「電話聯絡」由 --fs-h3 降一階為 --fs-body；
+   左欄「LINE 結緣」小標維持 --fs-h3（.contact__lead 基礎值）。
+   兩欄小標刻意不同階 —— 這就是「LINE 為主、電話為次」的視覺表達，勿改成一致。
+   ⚠️ 不得再降到 --fs-label：那會與同欄的 --fs-phone-label 同值，
+   小標與其下的「手機一／手機二」一樣大，主次階層當場消失（§5.8）。 */
+.contact__lead--phone {
+  font-size: var(--fs-body);
+}
+
 .contact__phone-label {
   margin-bottom: var(--sp-1);
   font-size: var(--fs-phone-label);

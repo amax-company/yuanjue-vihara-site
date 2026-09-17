@@ -45,7 +45,11 @@
   --fs-label: 17px;        /* 簡歷標籤與值、圖說、QR 說明、導覽提示 */
   --fs-nav: 18px;          /* 導覽列項目 */
   --fs-phone-label: 17px;  /* 「手機一／手機二」標籤 */
-  --fs-phone: 30px;        /* 電話號碼 */
+  --fs-phone: 28px;        /* 電話號碼（§5.8 聯絡區的兩支主要電話）。
+                              E-28（2026-09-17）由 30px 降為 28px，勿改回：
+                              客戶「LINE 為主，電話可縮」（Jeff 09-16 17:52 裁決）。
+                              ⚠️ 三斷點同值 28px ＝ §4.2 的電話硬性下限，餘裕 0，
+                              **不得再往下調任何一階**（下限是為年長受眾訂的，§1.4）。 */
   --fs-footer: 18px;       /* 頁尾文字 */
   --fs-fineprint: 16px;    /* 版權列 */
 
@@ -79,7 +83,11 @@
   --container-max: 1120px;  /* 內容容器最大寬 */
   --qr-size: 240px;         /* §5.8 LINE QR 區塊邊長（正方形，寬＝高）。
                                v2.0 由 200px 放大，勿改回：修改單 08 要求 QR 視覺權重
-                               高於電話，且**只以放大 QR 達成**（--fs-phone 一字不動）。
+                               高於電話，且**該權重只以放大 QR 達成**。
+                               ⚠️ E-28（2026-09-17）後的正確讀法（§4.3）：--fs-phone 確實
+                               已降到 28px，但那是客戶「電話可縮」的**獨立要求**，
+                               **不是**用來湊 §5.8 的面積不等式；本 token 不得因此調回 200px，
+                               --fs-phone 也不得再為了拉開面積差往下調（它已在下限）。
                                手機斷點由元件層以 min(var(--qr-size), 100%) 收縮，
                                維持 1:1；實檔到位後同一 token 套用於 line-qr.png。 */
 
@@ -154,7 +162,7 @@
     --fs-label: 17px;
     --fs-nav: 18px;
     --fs-phone-label: 17px;
-    --fs-phone: 32px;
+    --fs-phone: 28px;        /* E-28：由 32px 降為 28px（＝電話下限，勿改回、不得再降） */
     --fs-footer: 18px;
     --fs-fineprint: 16px;
 
@@ -182,7 +190,7 @@
     --fs-label: 17px;
     --fs-nav: 18px;
     --fs-phone-label: 17px;
-    --fs-phone: 36px;
+    --fs-phone: 28px;        /* E-28：由 36px 降為 28px（＝電話下限，勿改回、不得再降） */
     --fs-footer: 18px;
     --fs-fineprint: 16px;
 
