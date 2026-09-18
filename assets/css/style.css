@@ -843,6 +843,46 @@ section[id] {
   color: var(--c-ink-soft);
 }
 
+/* ---- §5.8 Facebook 連結（E-33，2026-09-18，客戶修改單第 11 項）----
+   樣式＝**全站一般文字連結**：色 --c-brown、text-decoration: underline、
+   字級 --fs-body（§4.2）、水平置中、可點區域 >= --tap-min（§4.7）。
+   🚨 視覺權重低於 QR（§5.8）：**不放大**（字級不高於 --fs-body）、**無框**、**無底色**、
+      **非按鈕／膠囊**、**不使用 --c-gold**。故本規則刻意不寫 background／border。
+   ⚠️ hover 不變色、不位移、不放大 —— 全域 `a` 無 hover 規則，本檔亦不加，
+      底線在所有狀態下恆為 underline（AC-49 ⑧ 取樣值不因游標而變）。
+   ⚠️ 位置在 .contact-panel__line 群組內、QR 說明之下（該群組是面板上半部的置中群組，
+      E-33 起含四項）；聯絡須知框仍是面板的第二個子元素，橫跨整個面板寬度。
+   ⚠️ 不新增任何數值：間距 --sp-3／--sp-1、字級 --fs-body、色 --c-brown、
+      可點區域 --tap-min 全部走既有 token（§4 前言）。 */
+.contact__fb {
+  /* 區塊級 flex + width: fit-content + margin-inline: auto ＝ 收縮至內容寬後置中。
+     刻意不用 inline-flex：原子行內盒的上下外距會攪動行盒高度，
+     這裡需要的是與 .contact__qr-caption 同節奏的 --sp-3 區塊外距。 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-1);
+  width: fit-content;
+  max-width: 100%;
+  margin-block-start: var(--sp-3);
+  margin-inline: auto;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  padding-inline: var(--sp-1);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--c-brown);
+  text-decoration: underline;
+}
+
+/* 線性外連圖示：高度等於該行字高（1em ＝ --fs-body），色隨 currentColor
+   （＝ .contact__fb 的 --c-brown）。**無 fill、無品牌色**（AC-49 ⑨⑩）。 */
+.contact__fb-icon {
+  flex: none;
+  width: 1em;
+  height: 1em;
+}
+
 /* ---- §5.8 聯絡須知框（v2.0，修改單 08）----
    位置在上方 LINE 三項之下、同一面板內、橫跨整個面板寬度。
    🚨 三段本文字級為 --fs-body（與 §5.5b 本文相同），**不得縮小**；
