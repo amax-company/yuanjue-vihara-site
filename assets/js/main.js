@@ -1,11 +1,12 @@
 /* ==========================================================================
    圓覺經舍 — 互動（vanilla JS，零依賴，spec DEC-01）
 
-   本檔只做四件事，全部在 spec §5 有明文：
+   本檔只做五件事，全部在 spec §5 有明文：
      1. §5.1.1  手機導覽三態（收合／展開／無 JS）
      2. §5.11   捲動淡入（IntersectionObserver，一次性）
      3. §5.12   燈箱（三種關閉方式、焦點管理、body 鎖捲）
      4. §5.1    目前所在區塊的導覽項標示（選配）
+     5. §5.8b   一鍵複製（v2.1；按鈕由本檔注入，故無 JS 時不存在）
 
    本檔**不得**出現 font-size 字面值與 hex 色碼（spec §4 前言）：
    所有樣式差異一律靠切換 class，由 style.css 以 token 決定外觀。
@@ -242,5 +243,90 @@
     }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
 
     sections.forEach(function (section) { spy.observe(section); });
+  }
+
+  /* =====================================================================
+     5. §5.8b 一鍵複製（v2.1，vanilla JS，零依賴 DEC-01）
+
+     ⚠️ 本段註解**刻意不重述 §9 N-06 被限定的字眼**（只允許出現在 index.html 的
+        <section id="offering"> 之內，見 tools/verify/check-forbidden.py 的範圍判斷）。
+        唯一的例外是下方三個常數：它們是 §附錄 A.8b 指定的介面文字本身，
+        由本檔寫進 #offering 內的回饋容器（check-forbidden 對「spec 指定字串」放行，
+        不是把檢查關掉 —— 判準與放行清單都由 spec 機械推導）。
+
+     🚨 「複製」按鈕**由本檔注入**，不是寫在 index.html 裡再用 CSS 藏 ——
+        §5.8b／§5.11 的明文要求是「無 JS 時本按鈕**不出現**」，
+        CSS 藏起來的按鈕在 DOM 裡仍然數得到 1 個（D5 ④ 判準是數量 0），
+        而被複製的那一列文字本身一律完整可見、可手動選取
+        （它是內容，按鈕只是操作捷徑）。
+
+     三種結果（§5.8b 逐一正面列舉）：
+       成功         -> 剪貼簿寫入該列的值（含連字號）＋回饋「已複製」，2 秒後消失
+       失敗／不支援 -> 選取該列文字＋回饋 fallback 提示，同樣 2 秒後消失
+       reduced-motion -> 與上述**完全相同**的呈現（本功能不帶任何 transition／animation，
+                         回饋是純顯示切換，故不需要為 prefers-reduced-motion 加分支）
+     🚨 不得靜默失敗：三條路徑都一定會顯示回饋文字。
+     ===================================================================== */
+  var account = document.querySelector('[data-copy-account]');
+  var copySlot = document.querySelector('[data-copy-slot]');
+  var copyFeedback = document.querySelector('[data-copy-feedback]');
+  /* 三句介面文字依 §附錄 A.8b（PM 擬定、唯一允許的介面文字）：
+     不得改成「一鍵複製」「點我複製」等更強的動作語氣（§5.8b 素淨要求、AC-48）；
+     fallback 提示不得寫 Ctrl+C（非中文字串，§1.3 未列入允許清單）。 */
+  var COPY_LABEL = '複製';
+  var COPY_DONE = '已複製';
+  var COPY_FALLBACK = '已選取帳號，請手動複製';
+  var FEEDBACK_MS = 2000; /* §5.8b：回饋文字 2 秒後消失 */
+  var feedbackTimer = null;
+
+  function sayCopyResult(message) {
+    if (!copyFeedback) return;
+    copyFeedback.textContent = message;
+    if (feedbackTimer) window.clearTimeout(feedbackTimer);
+    feedbackTimer = window.setTimeout(function () {
+      copyFeedback.textContent = '';
+      feedbackTimer = null;
+    }, FEEDBACK_MS);
+  }
+
+  /* fallback：以 window.getSelection() + Range 選取該列的文字節點（§5.8b）。
+     不使用任何第三方套件（DEC-01）。 */
+  function selectAccountText() {
+    if (!account || typeof window.getSelection !== 'function') return false;
+    var selection = window.getSelection();
+    if (!selection || typeof document.createRange !== 'function') return false;
+    var range = document.createRange();
+    range.selectNodeContents(account);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    return true;
+  }
+
+  if (account && copySlot && copyFeedback) {
+    var copyButton = document.createElement('button');
+    copyButton.type = 'button';
+    copyButton.className = 'offering-card__copy';
+    /* 按鈕內只有文字 —— 不得放 <svg>／<img>／icon 字元（§5.8b、AC-48） */
+    copyButton.textContent = COPY_LABEL;
+    copySlot.appendChild(copyButton);
+
+    copyButton.addEventListener('click', function () {
+      /* 複製的是**該列的文字內容**（含連字號，逐字依附錄 A.8b）：
+         讀 textContent 而非畫面上的排版結果，故 CSS 換行與否都不影響複製字串。 */
+      var text = account.textContent.trim();
+      var clip = navigator.clipboard;
+      if (!clip || typeof clip.writeText !== 'function') {
+        selectAccountText();
+        sayCopyResult(COPY_FALLBACK);
+        return;
+      }
+      clip.writeText(text).then(function () {
+        sayCopyResult(COPY_DONE);
+      }, function () {
+        /* 非安全情境、權限被拒、Promise reject 一律落到 fallback（§5.8b） */
+        selectAccountText();
+        sayCopyResult(COPY_FALLBACK);
+      });
+    });
   }
 }());

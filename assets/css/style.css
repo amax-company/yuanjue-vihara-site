@@ -876,6 +876,130 @@ section[id] {
 }
 
 /* ==========================================================================
+   §5.8b 本區（v2.1，修改單 v2 第 10 項；文案逐字來源為 §附錄 A.8b）
+
+   ⚠️ 本段註解**刻意不重述 §9 N-06 被限定的字眼**（它們只允許出現在 index.html 的
+      <section id="offering"> 之內）：寫在 CSS 註解裡就會被
+      tools/verify/check-forbidden.py 的範圍判斷算成「區外命中」。
+      四列以 §附錄 A.8b 表格的列序稱之（第一～第四列）。
+
+   🚨 素淨是本區的硬要求（客戶「單純，規矩，不要太多的美麗色彩與宣傳」）：
+      底色依 §5 前言＝--c-bg（**不另加色塊**，故 HTML 不套 .section--alt）、
+      無醒目按鈕、無圖示、無 --c-gold（<h2> 下的短細線屬 §4.1 用途②，走共用
+      .section-head__rule，本區不再自行用金色）。
+   🚨 區塊留白由 .section 的 --sp-section 提供，**不得**改用 --sp-section-lg。
+   ========================================================================== */
+.offering__lead {
+  font-size: var(--fs-body);
+  color: var(--c-ink);
+  line-height: var(--lh-body);
+  text-align: start;
+  margin-bottom: var(--sp-4);
+}
+
+/* 帳戶資訊卡（§5.8b）：底 --c-surface、1px --c-line、內距 --sp-4。
+   四列以 grid 排「欄位名 ＋ 值」，欄位名寬度自適應，值佔剩餘空間。
+   🚨 四列的值字級一律 --fs-body，**不得為了排版縮小任何一列**
+      （修改單明文：第四列須與第二、第三列同等字級）。 */
+.offering-card {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: var(--sp-3);
+  row-gap: var(--sp-3);
+  background-color: var(--c-surface);
+  border: var(--bw-hair) solid var(--c-line);
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-4); /* §5.8b：資訊卡與「＠溫馨提醒」<h3> 之間距 --sp-4 */
+}
+
+.offering-card__label {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--c-ink-soft);
+}
+
+.offering-card__value {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--c-ink);
+}
+
+/* 第二列：值 + 複製按鈕 + 回饋文字同一列，空間不足時按鈕折到下一行，
+   **值本身永不斷行**（下一條的 nowrap，D16）。 */
+.offering-card__value--account {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--sp-2);
+  row-gap: var(--sp-1);
+}
+
+/* 🚨 手機 375 不得把第二列的值斷成兩段數字（§5.10、D16）：連字號是客戶指定格式的
+   一部分，瀏覽器會在連字號後換行，故明文禁止。
+   複製出去的字串不受排版影響（JS 讀 textContent）。 */
+.offering-card__account {
+  white-space: nowrap;
+}
+
+/* 第四列值裡的那四個字加粗一階（§5.8b、§附錄 A.8b，引號不加粗）。
+   🚨 字族仍是 --ff-body（只載入 400），故 600 由瀏覽器**合成**產生 ——
+      §4.6「禁止載入上表以外的字重」一字未改，本處不得改成新增 wght@600 的字型請求。
+   var(--fw-title) 是 §4.6 唯一的 600，刻意引用它而非寫死數字（§4 前言）。 */
+.offering-card__strong {
+  font-weight: var(--fw-title);
+}
+
+/* 「複製」控制項（§5.8b、AC-48）：樣式與站上一般文字連結相同 ——
+   無底色（button reset 的 background: none）、無邊框（border: 0）、無圖示（按鈕內
+   不放 <svg>／<img>）、色 --c-brown、底線，可點區域 >= --tap-min。
+   ⚠️ 不得做成填色／膠囊／外框按鈕，也不得加剪貼簿圖示。
+   字級不設：由 .offering-card__value 繼承 --fs-body（button 的 font: inherit 在 reset）。 */
+.offering-card__copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  color: var(--c-brown);
+  text-decoration: underline;
+}
+
+/* 複製結果回饋（§5.8b）：字級 --fs-label、色 --c-ink-soft。
+   🚨 **刻意不設任何 transition／animation**：§5.8b 明文出現與消失是純顯示切換，
+      因此 prefers-reduced-motion 不影響本行為（不必為本區加例外）。
+      不得為了「好看」加淡入淡出。 */
+.offering-card__feedback {
+  font-size: var(--fs-label);
+  line-height: var(--lh-ui);
+  color: var(--c-ink-soft);
+}
+
+.offering__notice-title {
+  font-size: var(--fs-h3);
+  color: var(--c-brown);
+  margin-bottom: var(--sp-3);
+}
+
+/* 溫馨提醒兩段本文：字級 --fs-body、色 --c-ink、段距 --sp-3（由基礎 p 樣式提供）。 */
+.offering__notice {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--c-ink);
+}
+
+/* 「告知後三碼」錨點（§5.8b）：連結文字就是那四個字，前後不得加補充字。
+   可點區域 >= --tap-min（§4.7）：以 inline-block + line-height 撐到 44px，
+   維持在段落文字流之內（不改成 block，否則句子會被切斷）。 */
+.offering__anchor {
+  display: inline-block;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  line-height: var(--tap-min);
+  color: var(--c-brown);
+  text-decoration: underline;
+}
+
+/* ==========================================================================
    §5.9 頁尾
    ========================================================================== */
 .site-footer {
@@ -926,6 +1050,50 @@ section[id] {
 .site-footer__address {
   font-size: var(--fs-footer);
   margin-bottom: var(--sp-4);
+}
+
+/* §5.9／附錄 A.9 聲明兩段（v2.1 新增，修改單 v2 第 09 項）：
+   位置在地址列之下、版權列之上；字級 --fs-footer-note、色 --c-on-dark-muted、置中、
+   行長上限 min(--container-max, 68ch)、段距 --sp-2、其下 1px --c-footer-rule 細分隔線。
+   🚨 手機不可隱藏：不得用 display:none／max-height／overflow:hidden／「手機版精簡」
+      藏任一段（§5.9、AC-47）。
+
+   ⚠️ 兩個選擇器共用同一條寬度式，且**都**要設 font-size：`ch` 是以元素自己的字型與
+      字級解析的 —— 細分隔線若沿用頁尾的 --fs-footer（18px），68ch 會算出比聲明容器
+      更寬的值，§5.9 的「寬度與聲明容器同寬」就靜默不成立（畫面上只是線稍長，不報錯）。 */
+.site-footer__statement,
+.site-footer__note-rule {
+  width: 100%;
+  max-width: min(var(--container-max), 68ch);
+  margin-inline: auto;
+  font-size: var(--fs-footer-note);
+}
+
+.site-footer__statement {
+  padding-inline: var(--sp-gutter);
+  color: var(--c-on-dark-muted);
+  line-height: var(--lh-body);
+  text-align: center;
+}
+
+.site-footer__statement-text {
+  font-size: var(--fs-footer-note);
+  margin-bottom: 0;
+}
+
+/* §5.9：兩段之間留一行 ＝ --sp-2（不沿用基礎 p 的 --sp-3） */
+.site-footer__statement-text + .site-footer__statement-text {
+  margin-top: var(--sp-2);
+}
+
+/* 🚨 這條線**不是 --c-gold**：金色用途已由修改單 01 收斂為兩處（頁尾法師名之下的
+   短分隔線、各區 <h2> 下的短細線），本線不在那兩處之內，用金色就是擴張（AC-42 FAIL）。
+   ⚠️ 也不得與上方 .site-footer__rule 合併成一條 —— 那條仍在原位（法師名之下）。 */
+.site-footer__note-rule {
+  display: block;
+  height: var(--bw-hair);
+  margin-block: var(--sp-3);
+  background-color: var(--c-footer-rule);
 }
 
 .site-footer__copyright {
