@@ -773,8 +773,13 @@ section[id] {
 /* ==========================================================================
    §5.8 聯絡師父
    ========================================================================== */
-/* §5.8 手機（< 768px）：卡片內容全部置中（E-24）。
-   採 mobile-first：置中寫在預設層，平板／桌機於下方 min-width 查詢改回靠左。 */
+/* §5.8（E-31，2026-09-18）：本區只有 LINE，**三個斷點一律單欄置中**。
+   由上而下只有四項：LINE 小標 -> QR -> QR 說明 -> 聯絡須知框。
+   🚨 電話與地址的規則（.contact__lead--phone／.contact__phone-label／.contact__phone／
+      .contact__divider／.contact__address）已隨右欄整段移除而刪除 ——
+      沒有元素套用的規則留著就是第二份事實來源。要改回需先改 §5.8 並記一筆 changelog。
+   ⚠️ 不得因讀到 E-24 的「置中只適用手機斷點、不得擴張」而把桌機／平板改回靠左：
+      那條的限制對象是「兩欄版面」，而兩欄版面已隨 E-31 移除（§5.8 明文）。 */
 .contact-panel {
   background-color: var(--c-surface);
   border: var(--bw-hair) solid var(--c-line);
@@ -784,17 +789,13 @@ section[id] {
   text-align: center;
 }
 
+/* E-31：LINE 三項（小標／QR／說明）的群組 `.contact-panel__line` 是單欄 grid 的第一格，
+   不需要任何宣告 —— 它自然撐滿面板內容寬，內部各項以 text-align: center（文字）與
+   margin-inline: auto（區塊）置中。刻意不為它寫 `display: block` 之類的 no-op 規則。 */
 .contact__icon {
   width: var(--sp-4);
   height: var(--sp-4);
   color: var(--c-brown);
-}
-
-/* 手機：圖示與 QR 圖受全域 reset 為 display: block，text-align 對其無效，
-   須以 margin-inline: auto 置中（平板以上於下方 min-width 查詢歸零）。 */
-.contact__icon:not(.contact__icon--inline),
-.contact__qr {
-  margin-inline: auto;
 }
 
 .contact__icon--inline {
@@ -812,6 +813,9 @@ section[id] {
   letter-spacing: var(--ls-title);
 }
 
+/* 「LINE 結緣」小標：圖示 + 文字同一行、整行置中。
+   ⚠️ 字級維持 --fs-h3（§5.8、D25 ③ 仍有效的那一項），勿降階：
+      E-28／E-29 的降階對象是已被 E-31 移除的電話小標，不是本列。 */
 .contact__lead--qr {
   margin-block-start: 0;
   display: flex;
@@ -820,62 +824,15 @@ section[id] {
   gap: var(--sp-1);
 }
 
-/* §5.8（E-28，2026-09-17）：右欄電話小標「電話聯絡」由 --fs-h3 降一階為 --fs-body；
-   左欄「LINE 結緣」小標維持 --fs-h3（.contact__lead 基礎值）。
-   兩欄小標刻意不同階 —— 這就是「LINE 為主、電話為次」的視覺表達，勿改成一致。
-   ⚠️ 不得再降到 --fs-label：那會與同欄的 --fs-phone-label 同值，
-   小標與其下的「手機一／手機二」一樣大，主次階層當場消失（§5.8）。 */
-.contact__lead--phone {
-  font-size: var(--fs-body);
-}
-
-.contact__phone-label {
-  margin-bottom: var(--sp-1);
-  font-size: var(--fs-phone-label);
-  line-height: var(--lh-ui);
-  color: var(--c-ink-soft);
-}
-
-.contact__phone {
-  margin-bottom: var(--sp-4);
-  font-family: var(--ff-title);
-  font-weight: var(--fw-title);
-  font-size: var(--fs-phone);
-  line-height: var(--lh-tight);
-}
-
-.contact__phone > a {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--tap-min);
-  color: var(--c-ink);
-}
-
-.contact__divider {
-  height: var(--bw-hair);
-  background-color: var(--c-line);
-  margin-block: var(--sp-5);
-}
-
-/* §5.8／N-02／N-03：地址為純文字，不加連結、不嵌地圖 */
-.contact__address {
-  font-size: var(--fs-body);
-  line-height: var(--lh-body);
-  margin-bottom: 0;
-}
-
-/* §5.8 手機：地址為「圖示在上、文字在下」，不並排、不留懸掛縮排 */
-.contact__address .contact__icon--inline {
-  display: block;
-  margin-inline: auto;
-  margin-block-end: var(--sp-1);
-}
-
+/* QR 圖受全域 reset 為 display: block，text-align 對它無效，
+   須以 margin-inline: auto 置中（E-31 後三個斷點皆置中，故無 min-width 覆寫）。
+   width 用 min()：容器寬不足時收縮並維持 1:1（§4.3 明文，E-31 起不限手機斷點）。 */
 .contact__qr {
   width: min(var(--qr-size), 100%);
   height: auto;
   aspect-ratio: 1 / 1;
   border: var(--bw-hair) solid var(--c-line);
+  margin-inline: auto;
 }
 
 .contact__qr-caption {
@@ -887,13 +844,16 @@ section[id] {
 }
 
 /* ---- §5.8 聯絡須知框（v2.0，修改單 08）----
-   位置在聯絡資訊之下、同一面板內、橫跨整個面板寬度。
+   位置在上方 LINE 三項之下、同一面板內、橫跨整個面板寬度。
    🚨 三段本文字級為 --fs-body（與 §5.5b 本文相同），**不得縮小**；
-   框內不得使用 --c-gold、不得加裝飾線（§4.1 v2.0 收斂）。 */
+   框內不得使用 --c-gold、不得加裝飾線（§4.1 v2.0 收斂）。
+   ⚠️ text-align: start 是 §5.8 第 4 項的明文要求（框內文字左對齊），
+      用來擋掉 .contact-panel 的 text-align: center 繼承 —— 不是漏改的殘留。 */
 .contact-notice {
   background-color: var(--c-bg-alt);
   border: var(--bw-hair) solid var(--c-line);
   padding: var(--sp-4);
+  text-align: start;
 }
 
 .contact-notice__title {
@@ -908,35 +868,10 @@ section[id] {
 }
 
 @media (min-width: 768px) {
-  /* §5.8 平板／桌機：維持左右兩欄、內容靠左（置中規則只適用手機斷點）。
-     ⚠️ v2.0 左右對調：**左欄＝LINE（主要）**、右欄＝電話與地址（次要）。
-     左欄用 minmax(var(--qr-size), 5fr)：768 的可用寬下 5fr 只有約 213px，
-     純 fr 會把 QR 壓到小於 --qr-size（§4.3 的收縮條款只授權給手機斷點）。 */
+  /* §5.8 平板／桌機：**維持單欄置中**（E-31），只把面板內距放大到 --sp-8。
+     ⚠️ 勿加 grid-template-columns / text-align: start —— 那是 E-31 前的兩欄版面。 */
   .contact-panel {
-    grid-template-columns: minmax(var(--qr-size), 5fr) 7fr;
-    gap: var(--sp-8);
     padding: var(--sp-8);
-    text-align: start;
-  }
-
-  /* 聯絡須知橫跨整個面板寬度（§5.8） */
-  .contact-notice {
-    grid-column: 1 / -1;
-  }
-
-  .contact__lead--qr {
-    justify-content: flex-start;
-  }
-
-  .contact__address .contact__icon--inline {
-    display: inline-block;
-    margin-inline: 0 var(--sp-1);
-    margin-block-end: 0;
-  }
-
-  .contact__icon:not(.contact__icon--inline),
-  .contact__qr {
-    margin-inline: 0;
   }
 }
 
@@ -982,6 +917,15 @@ section[id] {
   align-items: center;
   min-height: var(--tap-min);
   color: var(--c-on-dark);
+}
+
+/* §5.9／附錄 A.9 地址列（E-31 新增）：電話列之下、版權列之上。
+   字級 --fs-footer（與上方電話列同一列字級，§5.9 明文；勿把 --fs-phone 套回頁尾）、
+   色 --c-on-dark（由 .site-footer 繼承）、置中（由 .site-footer 的 text-align 繼承）。
+   純文字：本列不得有 <a>、不得嵌地圖（§9 N-02／N-03）。 */
+.site-footer__address {
+  font-size: var(--fs-footer);
+  margin-bottom: var(--sp-4);
 }
 
 .site-footer__copyright {
